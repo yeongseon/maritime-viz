@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
@@ -43,7 +43,12 @@ function VesselHull({ length, color }: { length: number; color: string }) {
 }
 
 function ContainersOnDeck({ vesselLength, loadRatio }: { vesselLength: number; loadRatio: number }) {
-  const boxes = useMemo(() => {
+  const meshRef = useRef<THREE.InstancedMesh>(null)
+  const palette = useMemo(() => [
+    new THREE.Color('#ef4444'), new THREE.Color('#3b82f6'), new THREE.Color('#10b981'),
+    new THREE.Color('#f59e0b'), new THREE.Color('#8b5cf6'), new THREE.Color('#06b6d4'),
+  ], [])
+  const positions = useMemo(() => {
     const result: Array<[number, number, number]> = []
     const cols = Math.floor(vesselLength * 0.6)
     const rows = 2
@@ -62,17 +67,27 @@ function ContainersOnDeck({ vesselLength, loadRatio }: { vesselLength: number; l
     return result
   }, [vesselLength, loadRatio])
 
-  const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4']
+  useEffect(() => {
+    const mesh = meshRef.current
+    if (!mesh) return
+    const m = new THREE.Matrix4()
+    positions.forEach((p, i) => {
+      m.makeTranslation(p[0], p[1], p[2])
+      mesh.setMatrixAt(i, m)
+      mesh.setColorAt(i, palette[i % palette.length])
+    })
+    mesh.count = positions.length
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+  }, [positions, palette])
+
+  if (positions.length === 0) return null
 
   return (
-    <group>
-      {boxes.map((pos, i) => (
-        <mesh key={i} position={pos}>
-          <boxGeometry args={[0.7, 0.3, 0.5]} />
-          <meshStandardMaterial color={colors[i % colors.length]} roughness={0.6} />
-        </mesh>
-      ))}
-    </group>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, Math.max(1, positions.length)]}>
+      <boxGeometry args={[0.7, 0.3, 0.5]} />
+      <meshStandardMaterial roughness={0.6} />
+    </instancedMesh>
   )
 }
 

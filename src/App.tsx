@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { PortScene } from './components/scene/PortScene'
+import { WorldScene } from './components/scene/WorldScene'
 import { InfoPanel } from './components/ui/InfoPanel'
 import { ControlPanel } from './components/ui/ControlPanel'
 import { StatusBar } from './components/ui/StatusBar'
 import { KnowledgeGraph } from './components/ui/KnowledgeGraph'
 import { TimelinePanel } from './components/ui/TimelinePanel'
 import { FilterPanel } from './components/ui/FilterPanel'
+import { TopBar } from './components/ui/TopBar'
 import { useStore } from './store/useStore'
 
 function isTypingTarget(target: EventTarget | null): boolean {
@@ -16,6 +18,8 @@ function isTypingTarget(target: EventTarget | null): boolean {
 
 export default function App() {
   const selectedEntity = useStore((s) => s.selectedEntity)
+  const viewMode = useStore((s) => s.viewMode)
+  const liveMode = useStore((s) => s.liveMode)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -38,6 +42,12 @@ export default function App() {
     }
     window.history.replaceState(null, '', url.toString())
   }, [selectedEntity])
+
+  useEffect(() => {
+    if (!liveMode) return
+    const id = window.setInterval(() => useStore.getState().applyLiveTick(), 5000)
+    return () => window.clearInterval(id)
+  }, [liveMode])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -70,6 +80,18 @@ export default function App() {
         case 'y':
         case 'Y':
           s.triggerCamera('side')
+          break
+        case 'w':
+        case 'W':
+          s.setViewMode(s.viewMode === 'port' ? 'world' : 'port')
+          break
+        case 'm':
+        case 'M':
+          s.toggleLiveMode()
+          break
+        case 'k':
+        case 'K':
+          s.setLanguage(s.language === 'ko' ? 'en' : 'ko')
           break
         case '1':
           s.setOverlayMode('none')
@@ -105,12 +127,13 @@ export default function App() {
 
   return (
     <div className="relative w-full h-full">
-      <PortScene />
+      {viewMode === 'world' ? <WorldScene /> : <PortScene />}
+      <TopBar />
       <StatusBar />
       <InfoPanel />
-      <ControlPanel />
-      <FilterPanel />
-      <TimelinePanel />
+      {viewMode === 'port' && <ControlPanel />}
+      {viewMode === 'port' && <FilterPanel />}
+      {viewMode === 'port' && <TimelinePanel />}
       <KnowledgeGraph />
     </div>
   )

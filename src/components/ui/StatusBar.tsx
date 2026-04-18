@@ -1,7 +1,8 @@
 import { useStore } from '../../store/useStore'
+import { t } from '../../i18n'
 
 export function StatusBar() {
-  const { portData, overlayMode, currentTime, timeFilterEnabled } = useStore()
+  const { portData, overlayMode, currentTime, timeFilterEnabled, language } = useStore()
 
   const totalEmissions = portData.emissions.reduce((sum, e) => sum + e.co2Tons, 0)
   const avgYardUtil = portData.yardBlocks.length > 0
@@ -14,13 +15,13 @@ export function StatusBar() {
 
   return (
     <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[calc(100vw-2rem)]">
-      <MetricBadge label="Berth Occ." value={`${Math.round(berthOccupancy * 100)}%`} color={berthOccupancy > 0.7 ? '#f59e0b' : '#10b981'} />
-      <MetricBadge label="Yard Avg" value={`${Math.round(avgYardUtil * 100)}%`} color={avgYardUtil > 0.7 ? '#f59e0b' : '#10b981'} />
-      <MetricBadge label="CO2 Total" value={`${totalEmissions.toFixed(1)}t`} color={totalEmissions > 50 ? '#ef4444' : '#f59e0b'} highlight={overlayMode === 'carbon'} />
-      <MetricBadge label="Alerts" value={`${criticalEvents}`} color={criticalEvents > 0 ? '#ef4444' : '#10b981'} highlight={overlayMode === 'delay'} />
+      <MetricBadge label={t('berth_occ', language)} value={`${Math.round(berthOccupancy * 100)}%`} color={berthOccupancy > 0.7 ? '#f59e0b' : '#10b981'} />
+      <MetricBadge label={t('yard_avg', language)} value={`${Math.round(avgYardUtil * 100)}%`} color={avgYardUtil > 0.7 ? '#f59e0b' : '#10b981'} />
+      <MetricBadge label={t('co2_total', language)} value={`${totalEmissions.toFixed(1)}t`} color={totalEmissions > 50 ? '#ef4444' : '#f59e0b'} highlight={overlayMode === 'carbon'} />
+      <MetricBadge label={t('alerts', language)} value={`${criticalEvents}`} color={criticalEvents > 0 ? '#ef4444' : '#10b981'} highlight={overlayMode === 'delay'} />
       {timeFilterEnabled && (
         <MetricBadge
-          label="Sim Time"
+          label={t('sim_time', language)}
           value={new Date(currentTime).toISOString().slice(11, 16) + 'Z'}
           color="#a78bfa"
           highlight

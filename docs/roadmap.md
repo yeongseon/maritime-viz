@@ -11,15 +11,17 @@
 - [x] **온톨로지 필터 패널** — 엔티티 종류 + 관계 타입 토글
 - [x] **데이터 임포트** — JSON 업로드 + 스키마 검증 + 리셋
 - [x] **모바일 반응형 레이아웃** — 패널 접기/펼치기, 터치 제스처
-- [ ] 다국어 (영어 UI 토글)
+- [x] 다국어 (한국어 / 영어 UI 토글)
 
-## 중기 (v0.5)
+## 중기 (v0.5) — ✅ 완료
 
-- [ ] **글로벌 항로 뷰** — Layer 1 (해상 네트워크)
-- [ ] **내륙 운송 뷰** — Layer 3 (트럭/철도 ICD 연결)
-- [ ] WebSocket 기반 실시간 데이터 모드
+- [x] **글로벌 항로 뷰** — Layer 1 (해상 네트워크, 15 ports + 20 routes, 애니메이션 도트)
+- [x] **Live mode** — 5초 간격 시뮬레이션 데이터 변동 (게이트/야드/배출/CO2)
+- [x] 시간 슬라이더와 연동된 vessel 위치 보간 (approaching → berthed → departing 자동 전환)
+- [x] **InstancedMesh 최적화** — 컨테이너 렌더링 batch
+- [ ] 내륙 운송 뷰 — Layer 3 (트럭/철도 ICD 연결)
+- [ ] WebSocket 기반 실시간 데이터 모드 (현재는 클라이언트 시뮬레이션)
 - [ ] 컨테이너 개별 추적 뷰 (B/L 단위)
-- [ ] 시간 슬라이더와 연동된 vessel 위치 보간 (status 자동 전환)
 
 ## 장기 (v1.0)
 
@@ -42,7 +44,8 @@
 ## 기술 부채 정리
 
 - [ ] Three.js bundle 크기 최적화 (현재 1.1MB → 동적 import)
-- [ ] InstancedMesh로 컨테이너/야드 박스 렌더링 최적화
+- [x] InstancedMesh로 컨테이너 박스 렌더링 최적화
+- [ ] InstancedMesh로 야드 박스 렌더링 최적화
 - [ ] E2E 테스트 (Playwright)
 - [ ] Visual regression 테스트 (Percy/Chromatic)
 - [ ] Storybook으로 컴포넌트 카탈로그

@@ -1,10 +1,12 @@
 import { create } from 'zustand'
-import type { SelectedEntity, EntityType, RelationType, PortData } from '../types'
+import type { SelectedEntity, EntityType, RelationType, PortData, Vessel } from '../types'
 import { busanPortData } from '../data/portData'
+import type { Lang } from '../i18n'
 
 type OverlayMode = 'none' | 'congestion' | 'carbon' | 'delay'
 export type CameraPreset = 'reset' | 'top' | 'side' | 'focus'
 export type EntityKind = 'vessel' | 'terminal' | 'berth' | 'yard' | 'gate' | 'event'
+export type ViewMode = 'port' | 'world'
 
 export interface CameraCommand {
   preset: CameraPreset
@@ -45,11 +47,25 @@ function computeTimeRange(data: PortData): TimeRange {
   return { min: Math.min(...stamps), max: Math.max(...stamps) }
 }
 
+function lerp3(a: [number, number, number], b: [number, number, number], k: number): [number, number, number] {
+  return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]
+}
+
 interface AppState {
   portData: PortData
   isCustomData: boolean
   loadCustomData: (data: PortData) => void
   resetData: () => void
+
+  language: Lang
+  setLanguage: (l: Lang) => void
+
+  viewMode: ViewMode
+  setViewMode: (m: ViewMode) => void
+
+  liveMode: boolean
+  toggleLiveMode: () => void
+  applyLiveTick: () => void
 
   selectedEntity: SelectedEntity | null
   hoveredEntity: SelectedEntity | null
@@ -98,6 +114,7 @@ interface AppState {
   getRelatedEntities: (id: string) => string[]
   getEventsForEntity: (id: string) => PortData['events']
   getVisibleVessels: () => PortData['vessels']
+  getInterpolatedVessels: () => Vessel[]
   getVisibleEvents: () => PortData['events']
 }
 
@@ -126,6 +143,42 @@ export const useStore = create<AppState>((set, get) => ({
       selectedEntity: null,
     })
   },
+
+  language: 'ko',
+  setLanguage: (l) => set({ language: l }),
+
+  viewMode: 'port',
+  setViewMode: (m) => set({ viewMode: m }),
+
+  liveMode: false,
+  toggleLiveMode: () => set((s) => ({ liveMode: !s.liveMode })),
+  applyLiveTick: () => set((s) => {
+    if (!s.liveMode) return s
+    const next = { ...s.portData }
+    next.gates = s.portData.gates.map((g) => ({
+      ...g,
+      queueLength: Math.max(0, Math.round(g.queueLength + (Math.random() - 0.5) * 4)),
+      avgWaitMinutes: Math.max(1, Math.round(g.avgWaitMinutes + (Math.random() - 0.5) * 6)),
+    }))
+    next.terminals = s.portData.terminals.map((t) => ({
+      ...t,
+      gateQueueLength: Math.max(0, t.gateQueueLength + Math.round((Math.random() - 0.5) * 3)),
+      yardUtilization: Math.max(0.1, Math.min(0.99, t.yardUtilization + (Math.random() - 0.5) * 0.04)),
+    }))
+    next.yardBlocks = s.portData.yardBlocks.map((y) => {
+      const u = Math.max(0.1, Math.min(0.99, y.utilization + (Math.random() - 0.5) * 0.05))
+      return { ...y, utilization: u, containerCount: Math.round(u * y.maxCapacity) }
+    })
+    next.emissions = s.portData.emissions.map((e) => ({
+      ...e,
+      co2Tons: Math.max(0.5, +(e.co2Tons + (Math.random() - 0.5) * 1.5).toFixed(2)),
+    }))
+    next.vessels = s.portData.vessels.map((v) => ({
+      ...v,
+      co2EmissionRate: +Math.max(0.5, v.co2EmissionRate + (Math.random() - 0.5) * 0.4).toFixed(2),
+    }))
+    return { portData: next }
+  }),
 
   selectedEntity: null,
   hoveredEntity: null,
@@ -286,11 +339,51 @@ export const useStore = create<AppState>((set, get) => ({
   getVisibleVessels: () => {
     const s = get()
     if (!s.visibleEntityKinds.has('vessel')) return []
-    if (!s.timeFilterEnabled) return s.portData.vessels
-    return s.portData.vessels.filter((v) => {
+    const all = s.timeFilterEnabled ? s.getInterpolatedVessels() : s.portData.vessels
+    if (!s.timeFilterEnabled) return all
+    return all.filter((v) => {
       const eta = new Date(v.eta).getTime()
       const etd = new Date(v.etd).getTime()
       return s.currentTime >= eta - 6 * 3600_000 && s.currentTime <= etd + 6 * 3600_000
+    })
+  },
+
+  getInterpolatedVessels: () => {
+    const s = get()
+    const t = s.currentTime
+    const data = s.portData
+    return data.vessels.map<Vessel>((v) => {
+      const berth = v.assignedBerth ? data.berths.find((b) => b.id === v.assignedBerth) : null
+      const berthPos: [number, number, number] = berth
+        ? [berth.position[0], 0, berth.position[2] - 3]
+        : v.position
+      const eta = new Date(v.eta).getTime()
+      const etd = new Date(v.etd).getTime()
+      const approachStart: [number, number, number] = [berthPos[0] + (v.id.charCodeAt(7) % 2 ? 8 : -8), 0, -38]
+      const departEnd: [number, number, number] = [berthPos[0] + (v.id.charCodeAt(7) % 2 ? -10 : 10), 0, -42]
+
+      let pos: [number, number, number]
+      let status: Vessel['status']
+      let rotation = v.rotation
+
+      if (t < eta) {
+        const span = 6 * 3600_000
+        const k = Math.max(0, Math.min(1, (t - (eta - span)) / span))
+        pos = lerp3(approachStart, berthPos, k)
+        status = 'approaching'
+        rotation = Math.atan2(berthPos[0] - approachStart[0], berthPos[2] - approachStart[2])
+      } else if (t <= etd) {
+        pos = berthPos
+        status = 'berthed'
+        rotation = 0
+      } else {
+        const span = 6 * 3600_000
+        const k = Math.max(0, Math.min(1, (t - etd) / span))
+        pos = lerp3(berthPos, departEnd, k)
+        status = 'departing'
+        rotation = Math.atan2(departEnd[0] - berthPos[0], departEnd[2] - berthPos[2])
+      }
+      return { ...v, position: pos, rotation, status }
     })
   },
 
