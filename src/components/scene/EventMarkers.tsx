@@ -24,13 +24,14 @@ function getEventIcon(type: string): string {
 }
 
 export function EventMarkers() {
-  const { portData, overlayMode } = useStore()
+  const { portData, overlayMode, getVisibleEvents } = useStore()
+  const allVisible = getVisibleEvents()
 
   const visibleEvents = overlayMode === 'delay'
-    ? portData.events.filter((e) => e.type === 'delay' || e.type === 'congestion')
+    ? allVisible.filter((e) => e.type === 'delay' || e.type === 'congestion')
     : overlayMode === 'carbon'
-    ? portData.events.filter((e) => e.type === 'emission_alert')
-    : portData.events.filter((e) => e.severity === 'critical')
+    ? allVisible.filter((e) => e.type === 'emission_alert')
+    : allVisible.filter((e) => e.severity === 'critical')
 
   return (
     <group>

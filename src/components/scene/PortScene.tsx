@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import * as THREE from 'three'
@@ -47,9 +47,30 @@ function CameraController({ controlsRef }: { controlsRef: React.MutableRefObject
   return null
 }
 
+function TimeTicker() {
+  const lastRef = useRef<number | null>(null)
+  useFrame(() => {
+    const now = performance.now()
+    const last = lastRef.current ?? now
+    const dt = now - last
+    lastRef.current = now
+    if (dt > 0 && dt < 200) useStore.getState().tickTime(dt)
+  })
+  return null
+}
+
 export function PortScene() {
-  const { portData, selectEntity } = useStore()
+  const portData = useStore((s) => s.portData)
+  const selectEntity = useStore((s) => s.selectEntity)
+  const visibleEntityKinds = useStore((s) => s.visibleEntityKinds)
+  const getVisibleVessels = useStore((s) => s.getVisibleVessels)
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
+
+  const visibleVessels = getVisibleVessels()
+  const showTerminals = visibleEntityKinds.has('terminal')
+  const showBerths = visibleEntityKinds.has('berth')
+  const showYards = visibleEntityKinds.has('yard')
+  const showGates = visibleEntityKinds.has('gate')
 
   return (
     <Canvas
@@ -69,6 +90,7 @@ export function PortScene() {
         target={DEFAULT_TARGET}
       />
       <CameraController controlsRef={controlsRef} />
+      <TimeTicker />
 
       <ambientLight intensity={0.4} />
       <directionalLight position={[30, 40, 20]} intensity={1.2} castShadow />
@@ -82,19 +104,19 @@ export function PortScene() {
       <Ground />
       <Quay />
 
-      {portData.terminals.map((t) => (
+      {showTerminals && portData.terminals.map((t) => (
         <TerminalBlock key={t.id} terminal={t} />
       ))}
-      {portData.berths.map((b) => (
+      {showBerths && portData.berths.map((b) => (
         <BerthSlot key={b.id} berth={b} />
       ))}
-      {portData.yardBlocks.map((y) => (
+      {showYards && portData.yardBlocks.map((y) => (
         <YardArea key={y.id} yard={y} />
       ))}
-      {portData.gates.map((g) => (
+      {showGates && portData.gates.map((g) => (
         <GateEntry key={g.id} gate={g} />
       ))}
-      {portData.vessels.map((v) => (
+      {visibleVessels.map((v) => (
         <VesselModel key={v.id} vessel={v} />
       ))}
 

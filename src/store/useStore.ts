@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import type { SelectedEntity, EntityType } from '../types'
+import type { SelectedEntity, EntityType, RelationType, PortData } from '../types'
 import { busanPortData } from '../data/portData'
 
 type OverlayMode = 'none' | 'congestion' | 'carbon' | 'delay'
 export type CameraPreset = 'reset' | 'top' | 'side' | 'focus'
+export type EntityKind = 'vessel' | 'terminal' | 'berth' | 'yard' | 'gate' | 'event'
 
 export interface CameraCommand {
   preset: CameraPreset
@@ -18,8 +19,37 @@ export interface SearchResult {
   position: [number, number, number]
 }
 
+export interface TimeRange {
+  min: number
+  max: number
+}
+
+const ALL_ENTITY_KINDS: EntityKind[] = ['vessel', 'terminal', 'berth', 'yard', 'gate', 'event']
+const ALL_RELATION_TYPES: RelationType[] = [
+  'callsAt', 'assignedTo', 'handledBy', 'storedIn', 'transportedBy',
+  'deliveredTo', 'causes', 'affectedBy', 'produces', 'belongsTo', 'containedIn',
+]
+
+function computeTimeRange(data: PortData): TimeRange {
+  const stamps: number[] = []
+  data.events.forEach((e) => stamps.push(new Date(e.timestamp).getTime()))
+  data.vessels.forEach((v) => {
+    stamps.push(new Date(v.eta).getTime())
+    stamps.push(new Date(v.etd).getTime())
+  })
+  data.emissions.forEach((e) => stamps.push(new Date(e.timestamp).getTime()))
+  if (stamps.length === 0) {
+    const now = Date.now()
+    return { min: now - 12 * 3600_000, max: now + 12 * 3600_000 }
+  }
+  return { min: Math.min(...stamps), max: Math.max(...stamps) }
+}
+
 interface AppState {
-  portData: typeof busanPortData
+  portData: PortData
+  isCustomData: boolean
+  loadCustomData: (data: PortData) => void
+  resetData: () => void
 
   selectedEntity: SelectedEntity | null
   hoveredEntity: SelectedEntity | null
@@ -33,7 +63,6 @@ interface AppState {
   toggleRelations: () => void
   showLabels: boolean
   toggleLabels: () => void
-
   showGraphView: boolean
   toggleGraphView: () => void
 
@@ -45,15 +74,58 @@ interface AppState {
   triggerCamera: (preset: CameraPreset, target?: [number, number, number]) => void
   focusEntity: (id: string) => void
 
+  timeRange: TimeRange
+  currentTime: number
+  isPlaying: boolean
+  playbackSpeed: number
+  timeFilterEnabled: boolean
+  setCurrentTime: (t: number) => void
+  setPlaying: (p: boolean) => void
+  togglePlaying: () => void
+  setPlaybackSpeed: (s: number) => void
+  toggleTimeFilter: () => void
+  tickTime: (deltaMs: number) => void
+
+  visibleEntityKinds: Set<EntityKind>
+  visibleRelationTypes: Set<RelationType>
+  toggleEntityKind: (k: EntityKind) => void
+  toggleRelationType: (r: RelationType) => void
+  resetFilters: () => void
+
   getEntityName: (id: string) => string
   getEntityType: (id: string) => EntityType | null
   getEntityPosition: (id: string) => [number, number, number] | null
   getRelatedEntities: (id: string) => string[]
-  getEventsForEntity: (id: string) => typeof busanPortData.events
+  getEventsForEntity: (id: string) => PortData['events']
+  getVisibleVessels: () => PortData['vessels']
+  getVisibleEvents: () => PortData['events']
 }
+
+const initialRange = computeTimeRange(busanPortData)
 
 export const useStore = create<AppState>((set, get) => ({
   portData: busanPortData,
+  isCustomData: false,
+  loadCustomData: (data) => {
+    const range = computeTimeRange(data)
+    set({
+      portData: data,
+      isCustomData: true,
+      timeRange: range,
+      currentTime: range.max,
+      selectedEntity: null,
+    })
+  },
+  resetData: () => {
+    const range = computeTimeRange(busanPortData)
+    set({
+      portData: busanPortData,
+      isCustomData: false,
+      timeRange: range,
+      currentTime: range.max,
+      selectedEntity: null,
+    })
+  },
 
   selectedEntity: null,
   hoveredEntity: null,
@@ -67,7 +139,6 @@ export const useStore = create<AppState>((set, get) => ({
   toggleRelations: () => set((s) => ({ showRelations: !s.showRelations })),
   showLabels: true,
   toggleLabels: () => set((s) => ({ showLabels: !s.showLabels })),
-
   showGraphView: false,
   toggleGraphView: () => set((s) => ({ showGraphView: !s.showGraphView })),
 
@@ -104,6 +175,44 @@ export const useStore = create<AppState>((set, get) => ({
     if (pos) get().triggerCamera('focus', pos)
   },
 
+  timeRange: initialRange,
+  currentTime: initialRange.max,
+  isPlaying: false,
+  playbackSpeed: 1,
+  timeFilterEnabled: false,
+  setCurrentTime: (t) => set({ currentTime: t }),
+  setPlaying: (p) => set({ isPlaying: p }),
+  togglePlaying: () => set((s) => ({ isPlaying: !s.isPlaying })),
+  setPlaybackSpeed: (s) => set({ playbackSpeed: s }),
+  toggleTimeFilter: () => set((s) => ({ timeFilterEnabled: !s.timeFilterEnabled })),
+  tickTime: (deltaMs) => {
+    const s = get()
+    if (!s.isPlaying) return
+    const next = s.currentTime + deltaMs * s.playbackSpeed * 3.6
+    if (next >= s.timeRange.max) {
+      set({ currentTime: s.timeRange.max, isPlaying: false })
+    } else {
+      set({ currentTime: next })
+    }
+  },
+
+  visibleEntityKinds: new Set(ALL_ENTITY_KINDS),
+  visibleRelationTypes: new Set(ALL_RELATION_TYPES),
+  toggleEntityKind: (k) => set((s) => {
+    const next = new Set(s.visibleEntityKinds)
+    if (next.has(k)) next.delete(k); else next.add(k)
+    return { visibleEntityKinds: next }
+  }),
+  toggleRelationType: (r) => set((s) => {
+    const next = new Set(s.visibleRelationTypes)
+    if (next.has(r)) next.delete(r); else next.add(r)
+    return { visibleRelationTypes: next }
+  }),
+  resetFilters: () => set({
+    visibleEntityKinds: new Set(ALL_ENTITY_KINDS),
+    visibleRelationTypes: new Set(ALL_RELATION_TYPES),
+  }),
+
   getEntityName: (id: string) => {
     const d = get().portData
     const v = d.vessels.find((v) => v.id === id)
@@ -118,7 +227,7 @@ export const useStore = create<AppState>((set, get) => ({
     if (g) return `Gate ${g.id.split('_')[1]}`
     const e = d.events.find((e) => e.id === id)
     if (e) return e.description.slice(0, 40)
-    if (id === 'port_busan') return 'Busan Port'
+    if (id === d.port.id) return d.port.name
     return id
   },
 
@@ -130,7 +239,7 @@ export const useStore = create<AppState>((set, get) => ({
     if (d.yardBlocks.find((y) => y.id === id)) return 'yard'
     if (d.gates.find((g) => g.id === id)) return 'gate'
     if (d.events.find((e) => e.id === id)) return 'event'
-    if (id === 'port_busan') return 'port'
+    if (id === d.port.id) return 'port'
     return null
   },
 
@@ -172,5 +281,23 @@ export const useStore = create<AppState>((set, get) => ({
     return d.events.filter(
       (e) => e.targetId === id || e.relatedEntities.includes(id)
     )
+  },
+
+  getVisibleVessels: () => {
+    const s = get()
+    if (!s.visibleEntityKinds.has('vessel')) return []
+    if (!s.timeFilterEnabled) return s.portData.vessels
+    return s.portData.vessels.filter((v) => {
+      const eta = new Date(v.eta).getTime()
+      const etd = new Date(v.etd).getTime()
+      return s.currentTime >= eta - 6 * 3600_000 && s.currentTime <= etd + 6 * 3600_000
+    })
+  },
+
+  getVisibleEvents: () => {
+    const s = get()
+    if (!s.visibleEntityKinds.has('event')) return []
+    if (!s.timeFilterEnabled) return s.portData.events
+    return s.portData.events.filter((e) => new Date(e.timestamp).getTime() <= s.currentTime)
   },
 }))

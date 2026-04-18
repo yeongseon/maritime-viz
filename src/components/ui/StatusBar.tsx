@@ -1,19 +1,31 @@
 import { useStore } from '../../store/useStore'
 
 export function StatusBar() {
-  const { portData, overlayMode } = useStore()
+  const { portData, overlayMode, currentTime, timeFilterEnabled } = useStore()
 
   const totalEmissions = portData.emissions.reduce((sum, e) => sum + e.co2Tons, 0)
-  const avgYardUtil = portData.yardBlocks.reduce((sum, y) => sum + y.utilization, 0) / portData.yardBlocks.length
+  const avgYardUtil = portData.yardBlocks.length > 0
+    ? portData.yardBlocks.reduce((sum, y) => sum + y.utilization, 0) / portData.yardBlocks.length
+    : 0
   const criticalEvents = portData.events.filter((e) => e.severity === 'critical').length
-  const berthOccupancy = portData.berths.filter((b) => b.status === 'occupied').length / portData.berths.length
+  const berthOccupancy = portData.berths.length > 0
+    ? portData.berths.filter((b) => b.status === 'occupied').length / portData.berths.length
+    : 0
 
   return (
-    <div className="absolute top-4 left-4 flex gap-2">
+    <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[calc(100vw-2rem)]">
       <MetricBadge label="Berth Occ." value={`${Math.round(berthOccupancy * 100)}%`} color={berthOccupancy > 0.7 ? '#f59e0b' : '#10b981'} />
       <MetricBadge label="Yard Avg" value={`${Math.round(avgYardUtil * 100)}%`} color={avgYardUtil > 0.7 ? '#f59e0b' : '#10b981'} />
       <MetricBadge label="CO2 Total" value={`${totalEmissions.toFixed(1)}t`} color={totalEmissions > 50 ? '#ef4444' : '#f59e0b'} highlight={overlayMode === 'carbon'} />
       <MetricBadge label="Alerts" value={`${criticalEvents}`} color={criticalEvents > 0 ? '#ef4444' : '#10b981'} highlight={overlayMode === 'delay'} />
+      {timeFilterEnabled && (
+        <MetricBadge
+          label="Sim Time"
+          value={new Date(currentTime).toISOString().slice(11, 16) + 'Z'}
+          color="#a78bfa"
+          highlight
+        />
+      )}
     </div>
   )
 }

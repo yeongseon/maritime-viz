@@ -4,6 +4,8 @@ import { InfoPanel } from './components/ui/InfoPanel'
 import { ControlPanel } from './components/ui/ControlPanel'
 import { StatusBar } from './components/ui/StatusBar'
 import { KnowledgeGraph } from './components/ui/KnowledgeGraph'
+import { TimelinePanel } from './components/ui/TimelinePanel'
+import { FilterPanel } from './components/ui/FilterPanel'
 import { useStore } from './store/useStore'
 
 function isTypingTarget(target: EventTarget | null): boolean {
@@ -81,6 +83,16 @@ export default function App() {
         case '4':
           s.setOverlayMode('carbon')
           break
+        case ' ':
+          if (s.timeFilterEnabled) {
+            e.preventDefault()
+            s.togglePlaying()
+          }
+          break
+        case 'f':
+        case 'F':
+          s.toggleTimeFilter()
+          break
         case '/':
           e.preventDefault()
           document.getElementById('global-search')?.focus()
@@ -97,6 +109,8 @@ export default function App() {
       <StatusBar />
       <InfoPanel />
       <ControlPanel />
+      <FilterPanel />
+      <TimelinePanel />
       <KnowledgeGraph />
     </div>
   )

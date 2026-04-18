@@ -1,13 +1,14 @@
 import { useStore } from '../../store/useStore'
 import { SearchBox } from './SearchBox'
+import { DataImport } from './DataImport'
 
 export function InfoPanel() {
   const { selectedEntity, portData, getEntityName, getRelatedEntities, getEventsForEntity } = useStore()
 
   if (!selectedEntity) {
     return (
-      <div className="absolute top-4 right-4 w-80 bg-slate-900/95 border border-slate-700/50 rounded-xl p-5 backdrop-blur-md">
-        <h2 className="text-lg font-bold text-white mb-1">부산항 (Busan Port)</h2>
+      <div className="absolute top-4 right-4 w-[min(20rem,calc(100vw-2rem))] max-h-[calc(100vh-2rem)] overflow-y-auto bg-slate-900/95 border border-slate-700/50 rounded-xl p-5 backdrop-blur-md">
+        <h2 className="text-lg font-bold text-white mb-1">{portData.port.nameKo || portData.port.name}</h2>
         <p className="text-sm text-slate-400 mb-3">해운물류 온톨로지 3D 시각화</p>
         <SearchBox />
         <div className="grid grid-cols-2 gap-3 mt-4">
@@ -16,8 +17,11 @@ export function InfoPanel() {
           <StatCard label="Berths" value={portData.berths.length} />
           <StatCard label="Events" value={portData.events.length} color="#f59e0b" />
         </div>
-        <div className="mt-4 pt-3 border-t border-slate-700/50">
-          <p className="text-xs text-slate-500">Click any object · Press <kbd className="px-1 bg-slate-800 rounded">/</kbd> to search</p>
+        <div className="mt-3">
+          <DataImport />
+        </div>
+        <div className="mt-3 pt-3 border-t border-slate-700/50">
+          <p className="text-xs text-slate-500">Click any object · <kbd className="px-1 bg-slate-800 rounded">/</kbd> search · <kbd className="px-1 bg-slate-800 rounded">?</kbd> shortcuts</p>
         </div>
       </div>
     )
@@ -28,7 +32,7 @@ export function InfoPanel() {
   const events = getEventsForEntity(selectedEntity.id)
 
   return (
-    <div className="absolute top-4 right-4 w-80 max-h-[calc(100vh-2rem)] overflow-y-auto bg-slate-900/95 border border-blue-500/30 rounded-xl p-5 backdrop-blur-md">
+    <div className="absolute top-4 right-4 w-[min(20rem,calc(100vw-2rem))] max-h-[calc(100vh-2rem)] overflow-y-auto bg-slate-900/95 border border-blue-500/30 rounded-xl p-5 backdrop-blur-md">
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-xs text-blue-400 font-medium uppercase tracking-wider">{selectedEntity.type}</div>

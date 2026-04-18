@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { useStore } from '../../store/useStore'
 
 export function RelationLines() {
-  const { portData, selectedEntity, showRelations, getRelatedEntities } = useStore()
+  const { portData, selectedEntity, showRelations, getRelatedEntities, visibleRelationTypes } = useStore()
 
   const lines = useMemo(() => {
     if (!selectedEntity || !showRelations) return []
@@ -20,7 +20,21 @@ export function RelationLines() {
     const sourceEntity = allEntities.find((e) => e.id === selectedEntity.id)
     if (!sourceEntity) return []
 
+    const allowedTargets = new Set<string>()
+    portData.relations.forEach((r) => {
+      if (!visibleRelationTypes.has(r.type)) return
+      if (r.sourceId === selectedEntity.id) allowedTargets.add(r.targetId)
+      if (r.targetId === selectedEntity.id) allowedTargets.add(r.sourceId)
+    })
+    portData.events.forEach((e) => {
+      if (e.targetId === selectedEntity.id || e.relatedEntities.includes(selectedEntity.id)) {
+        allowedTargets.add(e.targetId)
+        e.relatedEntities.forEach((re) => allowedTargets.add(re))
+      }
+    })
+
     return relatedIds
+      .filter((rid) => allowedTargets.has(rid))
       .map((rid) => {
         const target = allEntities.find((e) => e.id === rid)
         if (!target) return null
@@ -31,7 +45,7 @@ export function RelationLines() {
         }
       })
       .filter(Boolean) as Array<{ id: string; from: [number, number, number]; to: [number, number, number] }>
-  }, [selectedEntity, showRelations, portData, getRelatedEntities])
+  }, [selectedEntity, showRelations, portData, getRelatedEntities, visibleRelationTypes])
 
   if (lines.length === 0) return null
 
