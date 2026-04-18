@@ -1,4 +1,5 @@
 import { useStore } from '../../store/useStore'
+import { SearchBox } from './SearchBox'
 
 export function InfoPanel() {
   const { selectedEntity, portData, getEntityName, getRelatedEntities, getEventsForEntity } = useStore()
@@ -7,15 +8,16 @@ export function InfoPanel() {
     return (
       <div className="absolute top-4 right-4 w-80 bg-slate-900/95 border border-slate-700/50 rounded-xl p-5 backdrop-blur-md">
         <h2 className="text-lg font-bold text-white mb-1">부산항 (Busan Port)</h2>
-        <p className="text-sm text-slate-400 mb-4">해운물류 온톨로지 3D 시각화</p>
-        <div className="grid grid-cols-2 gap-3">
+        <p className="text-sm text-slate-400 mb-3">해운물류 온톨로지 3D 시각화</p>
+        <SearchBox />
+        <div className="grid grid-cols-2 gap-3 mt-4">
           <StatCard label="Terminals" value={portData.terminals.length} />
           <StatCard label="Vessels" value={portData.vessels.length} />
           <StatCard label="Berths" value={portData.berths.length} />
           <StatCard label="Events" value={portData.events.length} color="#f59e0b" />
         </div>
         <div className="mt-4 pt-3 border-t border-slate-700/50">
-          <p className="text-xs text-slate-500">Click any object to explore relationships</p>
+          <p className="text-xs text-slate-500">Click any object · Press <kbd className="px-1 bg-slate-800 rounded">/</kbd> to search</p>
         </div>
       </div>
     )
@@ -71,8 +73,12 @@ export function InfoPanel() {
                 key={rid}
                 className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300 border border-slate-700/50 transition-colors"
                 onClick={() => {
-                  const type = getEntityType(rid, portData)
-                  if (type) useStore.getState().selectEntity({ id: rid, type })
+                  const s = useStore.getState()
+                  const type = s.getEntityType(rid)
+                  if (type) {
+                    s.selectEntity({ id: rid, type })
+                    s.focusEntity(rid)
+                  }
                 }}
               >
                 {getEntityName(rid)}
@@ -170,15 +176,5 @@ function findEntity(id: string, data: typeof import('../../data/portData').busan
   if (y) return y as unknown as Record<string, unknown>
   const g = data.gates.find((g) => g.id === id)
   if (g) return g as unknown as Record<string, unknown>
-  return null
-}
-
-function getEntityType(id: string, data: typeof import('../../data/portData').busanPortData) {
-  if (data.vessels.find((v) => v.id === id)) return 'vessel' as const
-  if (data.terminals.find((t) => t.id === id)) return 'terminal' as const
-  if (data.berths.find((b) => b.id === id)) return 'berth' as const
-  if (data.yardBlocks.find((y) => y.id === id)) return 'yard' as const
-  if (data.gates.find((g) => g.id === id)) return 'gate' as const
-  if (data.events.find((e) => e.id === id)) return 'event' as const
   return null
 }
