@@ -1,4 +1,5 @@
 import { useStore } from '../../store/useStore'
+import { t } from '../../i18n'
 
 const SPEEDS = [1, 4, 16, 64]
 
@@ -11,6 +12,7 @@ export function TimelinePanel() {
   const {
     timeRange, currentTime, isPlaying, playbackSpeed, timeFilterEnabled,
     setCurrentTime, togglePlaying, setPlaybackSpeed, toggleTimeFilter,
+    language,
   } = useStore()
 
   const span = timeRange.max - timeRange.min || 1
@@ -27,7 +29,7 @@ export function TimelinePanel() {
               ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/40'
               : 'bg-slate-800 text-slate-600 border border-slate-700/50 cursor-not-allowed'
           }`}
-          title={isPlaying ? 'Pause' : 'Play'}
+          title={isPlaying ? t('pause', language) : t('play', language)}
         >
           {isPlaying ? '❚❚' : '▶'}
         </button>
@@ -59,11 +61,11 @@ export function TimelinePanel() {
               : 'bg-slate-800 text-slate-400 border border-slate-700/50 hover:bg-slate-700'
           }`}
         >
-          {timeFilterEnabled ? '⏱ Time filter ON' : '⏱ Time filter OFF'}
+          {timeFilterEnabled ? t('time_filter_on', language) : t('time_filter_off', language)}
         </button>
 
         <div className="flex items-center gap-1">
-          <span className="mr-1">Speed:</span>
+          <span className="mr-1">{t('speed', language)}:</span>
           {SPEEDS.map((s) => (
             <button
               key={s}

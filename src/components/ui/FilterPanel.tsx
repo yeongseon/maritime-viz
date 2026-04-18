@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useStore, type EntityKind } from '../../store/useStore'
 import type { RelationType } from '../../types'
+import { t } from '../../i18n'
 
-const ENTITY_KINDS: Array<{ key: EntityKind; label: string; icon: string }> = [
-  { key: 'vessel', label: 'Vessels', icon: '🚢' },
-  { key: 'terminal', label: 'Terminals', icon: '🏗' },
-  { key: 'berth', label: 'Berths', icon: '⚓' },
-  { key: 'yard', label: 'Yards', icon: '📦' },
-  { key: 'gate', label: 'Gates', icon: '🚪' },
-  { key: 'event', label: 'Events', icon: '⚠' },
+const ENTITY_KINDS: Array<{ key: EntityKind; icon: string; tkey: Parameters<typeof t>[0] }> = [
+  { key: 'vessel', icon: '🚢', tkey: 'vessels' },
+  { key: 'terminal', icon: '🏗', tkey: 'terminals' },
+  { key: 'berth', icon: '⚓', tkey: 'berths' },
+  { key: 'yard', icon: '📦', tkey: 'yards' },
+  { key: 'gate', icon: '🚪', tkey: 'gates' },
+  { key: 'event', icon: '⚠', tkey: 'events' },
 ]
 
 const RELATION_TYPES: RelationType[] = [
@@ -20,6 +21,7 @@ export function FilterPanel() {
   const {
     visibleEntityKinds, visibleRelationTypes,
     toggleEntityKind, toggleRelationType, resetFilters,
+    language,
   } = useStore()
   const [open, setOpen] = useState(false)
 
@@ -31,7 +33,7 @@ export function FilterPanel() {
           className="px-3 py-2 bg-slate-900/95 border border-slate-700/50 rounded-xl text-xs text-slate-300 hover:bg-slate-800 backdrop-blur-md flex items-center gap-2"
           title="Open filters"
         >
-          <span>⚙</span> Filters
+          <span>⚙</span> {t('filters', language)}
           <span className="text-slate-500">
             ({visibleEntityKinds.size}/{ENTITY_KINDS.length})
           </span>
@@ -39,13 +41,13 @@ export function FilterPanel() {
       ) : (
         <div className="w-72 bg-slate-900/95 border border-slate-700/50 rounded-xl p-4 backdrop-blur-md">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-white">Filters</h3>
+            <h3 className="text-sm font-bold text-white">{t('filters', language)}</h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={resetFilters}
                 className="text-[10px] text-slate-400 hover:text-blue-400"
               >
-                Reset
+                {t('reset', language)}
               </button>
               <button
                 onClick={() => setOpen(false)}
@@ -56,7 +58,7 @@ export function FilterPanel() {
             </div>
           </div>
 
-          <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">Entities</div>
+          <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">{t('entities', language)}</div>
           <div className="grid grid-cols-2 gap-1.5 mb-3">
             {ENTITY_KINDS.map((ent) => {
               const active = visibleEntityKinds.has(ent.key)
@@ -70,13 +72,13 @@ export function FilterPanel() {
                       : 'bg-slate-800 text-slate-500 border border-slate-700/50 hover:bg-slate-700'
                   }`}
                 >
-                  <span>{ent.icon}</span> {ent.label}
+                  <span>{ent.icon}</span> {t(ent.tkey, language)}
                 </button>
               )
             })}
           </div>
 
-          <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">Relations</div>
+          <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1.5">{t('relations', language)}</div>
           <div className="flex flex-wrap gap-1">
             {RELATION_TYPES.map((rel) => {
               const active = visibleRelationTypes.has(rel)

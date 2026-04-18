@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { useStore } from '../../store/useStore'
 import type { PortData } from '../../types'
+import { t } from '../../i18n'
 
 const REQUIRED_KEYS: Array<keyof PortData> = [
   'port', 'terminals', 'berths', 'yardBlocks', 'gates',
@@ -25,7 +26,7 @@ function validatePortData(raw: unknown): PortData {
 }
 
 export function DataImport() {
-  const { isCustomData, loadCustomData, resetData } = useStore()
+  const { isCustomData, loadCustomData, resetData, language } = useStore()
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -44,11 +45,11 @@ export function DataImport() {
   return (
     <div className="border border-slate-700/50 rounded-lg p-3 bg-slate-800/40">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-xs font-semibold text-slate-300">Dataset</div>
+        <div className="text-xs font-semibold text-slate-300">{t('dataset', language)}</div>
         <div className={`text-[10px] px-2 py-0.5 rounded ${
           isCustomData ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-400'
         }`}>
-          {isCustomData ? 'CUSTOM' : 'DEMO'}
+          {isCustomData ? t('custom', language) : t('demo', language)}
         </div>
       </div>
 
@@ -68,14 +69,14 @@ export function DataImport() {
           onClick={() => fileRef.current?.click()}
           className="flex-1 px-2 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded text-xs font-medium border border-blue-500/40"
         >
-          ⬆ Load JSON
+          {t('load_json', language)}
         </button>
         {isCustomData && (
           <button
             onClick={() => { resetData(); setError(null) }}
             className="px-2 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-xs"
           >
-            Reset
+            {t('reset', language)}
           </button>
         )}
       </div>
@@ -85,7 +86,7 @@ export function DataImport() {
         </div>
       )}
       <div className="mt-1.5 text-[10px] text-slate-500">
-        Schema: PortData (port, terminals, berths, yardBlocks, gates, vessels, containers, events, emissions, relations)
+        {t('schema_hint', language)}
       </div>
     </div>
   )

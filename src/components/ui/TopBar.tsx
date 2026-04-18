@@ -30,6 +30,15 @@ export function TopBar() {
         >
           🌐 {t('view_world', language)}
         </button>
+        <button
+          onClick={() => setViewMode('inland')}
+          className={`px-3 py-1 text-xs font-medium transition-all ${
+            viewMode === 'inland' ? 'bg-blue-500/30 text-blue-200' : 'text-slate-400 hover:bg-slate-800'
+          }`}
+          title="I"
+        >
+          🚆 {t('view_inland', language)}
+        </button>
       </div>
 
       <div className="w-px h-5 bg-slate-700/60" />

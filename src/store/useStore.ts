@@ -6,7 +6,7 @@ import type { Lang } from '../i18n'
 type OverlayMode = 'none' | 'congestion' | 'carbon' | 'delay'
 export type CameraPreset = 'reset' | 'top' | 'side' | 'focus'
 export type EntityKind = 'vessel' | 'terminal' | 'berth' | 'yard' | 'gate' | 'event'
-export type ViewMode = 'port' | 'world'
+export type ViewMode = 'port' | 'world' | 'inland'
 
 export interface CameraCommand {
   preset: CameraPreset

@@ -45,6 +45,7 @@ const T: Dict = {
   schema_hint: { ko: '스키마: PortData (port, terminals, berths, yardBlocks, gates, vessels, containers, events, emissions, relations)', en: 'Schema: PortData (port, terminals, berths, yardBlocks, gates, vessels, containers, events, emissions, relations)' },
   view_port: { ko: '항만 뷰', en: 'Port View' },
   view_world: { ko: '글로벌 뷰', en: 'World View' },
+  view_inland: { ko: '내륙 뷰', en: 'Inland View' },
   live_on: { ko: '🔴 LIVE', en: '🔴 LIVE' },
   live_off: { ko: '⚪ 정적', en: '⚪ Static' },
   language: { ko: '언어', en: 'Language' },

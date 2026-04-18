@@ -49,6 +49,10 @@ export function InfoPanel() {
 
       {entity && <EntityDetails entity={entity} type={selectedEntity.type} />}
 
+      {selectedEntity.type === 'vessel' && (
+        <ContainerList vesselId={selectedEntity.id} />
+      )}
+
       {events.length > 0 && (
         <div className="mt-4 pt-3 border-t border-slate-700/50">
           <h3 className="text-sm font-semibold text-slate-300 mb-2">Events ({events.length})</h3>
@@ -101,6 +105,32 @@ function StatCard({ label, value, color }: { label: string; value: number; color
     <div className="bg-slate-800/60 rounded-lg p-3">
       <div className="text-2xl font-bold" style={{ color: color || '#60a5fa' }}>{value}</div>
       <div className="text-xs text-slate-400">{label}</div>
+    </div>
+  )
+}
+
+function ContainerList({ vesselId }: { vesselId: string }) {
+  const { portData, language } = useStore()
+  const containers = portData.containers.filter((c) => c.vesselId === vesselId)
+  if (containers.length === 0) return null
+  const visible = containers.slice(0, 6)
+  return (
+    <div className="mt-4 pt-3 border-t border-slate-700/50">
+      <h3 className="text-sm font-semibold text-slate-300 mb-2">
+        {t('containers', language)} ({containers.length})
+      </h3>
+      <div className="space-y-1">
+        {visible.map((c) => (
+          <div key={c.id} className="flex items-center justify-between text-[11px] bg-slate-800/50 rounded px-2 py-1">
+            <span className="font-mono text-slate-300">{c.id}</span>
+            <span className="text-slate-500">→ {c.destination}</span>
+            <span className="text-slate-400">{c.dwellTimeHours.toFixed(1)}h</span>
+          </div>
+        ))}
+        {containers.length > visible.length && (
+          <div className="text-[10px] text-slate-500 text-center pt-1">+ {containers.length - visible.length} more</div>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStore } from '../../store/useStore'
+import { t } from '../../i18n'
 
 const TYPE_ICON: Record<string, string> = {
   vessel: '🚢',
@@ -10,7 +11,7 @@ const TYPE_ICON: Record<string, string> = {
 }
 
 export function SearchBox() {
-  const { searchQuery, setSearchQuery, searchResults, selectEntity, focusEntity } = useStore()
+  const { searchQuery, setSearchQuery, searchResults, selectEntity, focusEntity, language } = useStore()
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const results = searchResults()
@@ -42,7 +43,7 @@ export function SearchBox() {
           if (e.key === 'Enter' && results[0]) pick(results[0].id, results[0].type)
           if (e.key === 'Escape') { setSearchQuery(''); setOpen(false); (e.target as HTMLInputElement).blur() }
         }}
-        placeholder="Search vessel / terminal / berth..  (/)"
+        placeholder={t('search_placeholder', language)}
         className="w-full px-3 py-2 bg-slate-800/80 border border-slate-700/60 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500/60"
       />
       {open && results.length > 0 && (
@@ -62,7 +63,7 @@ export function SearchBox() {
       )}
       {open && searchQuery && results.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-slate-500 z-10">
-          No matches
+          {t('no_matches', language)}
         </div>
       )}
     </div>

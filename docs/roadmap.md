@@ -13,15 +13,17 @@
 - [x] **모바일 반응형 레이아웃** — 패널 접기/펼치기, 터치 제스처
 - [x] 다국어 (한국어 / 영어 UI 토글)
 
-## 중기 (v0.5) — ✅ 완료
+## 중기 (v0.5/v0.6) — ✅ 완료
 
 - [x] **글로벌 항로 뷰** — Layer 1 (해상 네트워크, 15 ports + 20 routes, 애니메이션 도트)
+- [x] **내륙 운송 뷰** — Layer 3 (트럭/철도 ICD, 9 nodes + 9 links, 애니메이션 컨테이너 박스)
 - [x] **Live mode** — 5초 간격 시뮬레이션 데이터 변동 (게이트/야드/배출/CO2)
 - [x] 시간 슬라이더와 연동된 vessel 위치 보간 (approaching → berthed → departing 자동 전환)
 - [x] **InstancedMesh 최적화** — 컨테이너 렌더링 batch
-- [ ] 내륙 운송 뷰 — Layer 3 (트럭/철도 ICD 연결)
+- [x] **컨테이너 추적 뷰** — 선박 선택 시 실어진 컨테이너 목록 (B/L 단위)
+- [x] **코드 분할** — WorldScene / InlandScene / KnowledgeGraph 동적 import (초기 번들 42KB)
+- [x] UI 전체 i18n — KO/EN (StatusBar, InfoPanel, ControlPanel, FilterPanel, TimelinePanel, DataImport, SearchBox, TopBar)
 - [ ] WebSocket 기반 실시간 데이터 모드 (현재는 클라이언트 시뮬레이션)
-- [ ] 컨테이너 개별 추적 뷰 (B/L 단위)
 
 ## 장기 (v1.0)
 
@@ -43,7 +45,7 @@
 
 ## 기술 부채 정리
 
-- [ ] Three.js bundle 크기 최적화 (현재 1.1MB → 동적 import)
+- [x] Three.js bundle 동적 import (WorldScene/InlandScene/KnowledgeGraph 분할 ✅)
 - [x] InstancedMesh로 컨테이너 박스 렌더링 최적화
 - [ ] InstancedMesh로 야드 박스 렌더링 최적화
 - [ ] E2E 테스트 (Playwright)

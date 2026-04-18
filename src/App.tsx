@@ -1,14 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { PortScene } from './components/scene/PortScene'
-import { WorldScene } from './components/scene/WorldScene'
 import { InfoPanel } from './components/ui/InfoPanel'
 import { ControlPanel } from './components/ui/ControlPanel'
 import { StatusBar } from './components/ui/StatusBar'
-import { KnowledgeGraph } from './components/ui/KnowledgeGraph'
 import { TimelinePanel } from './components/ui/TimelinePanel'
 import { FilterPanel } from './components/ui/FilterPanel'
 import { TopBar } from './components/ui/TopBar'
 import { useStore } from './store/useStore'
+
+const WorldScene = lazy(() => import('./components/scene/WorldScene').then((m) => ({ default: m.WorldScene })))
+const InlandScene = lazy(() => import('./components/scene/InlandScene').then((m) => ({ default: m.InlandScene })))
+const KnowledgeGraph = lazy(() => import('./components/ui/KnowledgeGraph').then((m) => ({ default: m.KnowledgeGraph })))
+
+function SceneFallback() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-slate-950">
+      <div className="text-slate-400 text-sm animate-pulse">Loading scene…</div>
+    </div>
+  )
+}
 
 function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
@@ -82,8 +92,15 @@ export default function App() {
           s.triggerCamera('side')
           break
         case 'w':
-        case 'W':
-          s.setViewMode(s.viewMode === 'port' ? 'world' : 'port')
+        case 'W': {
+          const order: Array<'port' | 'world' | 'inland'> = ['port', 'world', 'inland']
+          const i = order.indexOf(s.viewMode)
+          s.setViewMode(order[(i + 1) % order.length])
+          break
+        }
+        case 'i':
+        case 'I':
+          s.setViewMode('inland')
           break
         case 'm':
         case 'M':
@@ -127,14 +144,20 @@ export default function App() {
 
   return (
     <div className="relative w-full h-full">
-      {viewMode === 'world' ? <WorldScene /> : <PortScene />}
+      {viewMode === 'world' ? (
+        <Suspense fallback={<SceneFallback />}><WorldScene /></Suspense>
+      ) : viewMode === 'inland' ? (
+        <Suspense fallback={<SceneFallback />}><InlandScene /></Suspense>
+      ) : (
+        <PortScene />
+      )}
       <TopBar />
       <StatusBar />
       <InfoPanel />
       {viewMode === 'port' && <ControlPanel />}
       {viewMode === 'port' && <FilterPanel />}
       {viewMode === 'port' && <TimelinePanel />}
-      <KnowledgeGraph />
+      <Suspense fallback={null}><KnowledgeGraph /></Suspense>
     </div>
   )
 }
