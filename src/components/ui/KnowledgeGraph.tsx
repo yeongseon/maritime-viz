@@ -169,14 +169,12 @@ function GraphNodeSphere({ node }: { node: GraphNode }) {
 }
 
 function GraphEdgeLine({ from, to }: { from: [number, number, number]; to: [number, number, number] }) {
-  const geometry = useMemo(() => {
+  const lineObject = useMemo(() => {
     const points = [new THREE.Vector3(...from), new THREE.Vector3(...to)]
-    return new THREE.BufferGeometry().setFromPoints(points)
+    const geometry = new THREE.BufferGeometry().setFromPoints(points)
+    const material = new THREE.LineBasicMaterial({ color: '#334155', transparent: true, opacity: 0.4 })
+    return new THREE.Line(geometry, material)
   }, [from, to])
 
-  return (
-    <line geometry={geometry}>
-      <lineBasicMaterial color="#334155" transparent opacity={0.4} />
-    </line>
-  )
+  return <primitive object={lineObject} />
 }

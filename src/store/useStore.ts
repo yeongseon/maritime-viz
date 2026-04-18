@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { SelectedEntity, EntityType } from '../types'
+import type { SelectedEntity } from '../types'
 import { busanPortData } from '../data/portData'
 
 type OverlayMode = 'none' | 'congestion' | 'carbon' | 'delay'

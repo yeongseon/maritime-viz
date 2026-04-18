@@ -1,5 +1,4 @@
-import { useRef, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { useStore } from '../../store/useStore'
 
@@ -46,10 +45,7 @@ export function RelationLines() {
 }
 
 function RelationLine({ from, to }: { from: [number, number, number]; to: [number, number, number] }) {
-  const lineRef = useRef<THREE.Line>(null)
-  const progressRef = useRef(0)
-
-  const geometry = useMemo(() => {
+  const lineObject = useMemo(() => {
     const mid: [number, number, number] = [
       (from[0] + to[0]) / 2,
       Math.max(from[1], to[1]) + 3,
@@ -61,17 +57,10 @@ function RelationLine({ from, to }: { from: [number, number, number]; to: [numbe
       new THREE.Vector3(...to)
     )
     const points = curve.getPoints(30)
-    return new THREE.BufferGeometry().setFromPoints(points)
+    const geometry = new THREE.BufferGeometry().setFromPoints(points)
+    const material = new THREE.LineBasicMaterial({ color: '#60a5fa', transparent: true, opacity: 0.5 })
+    return new THREE.Line(geometry, material)
   }, [from, to])
 
-  useFrame(() => {
-    progressRef.current += 0.01
-    if (progressRef.current > 1) progressRef.current = 0
-  })
-
-  return (
-    <line ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial color="#60a5fa" transparent opacity={0.5} linewidth={1} />
-    </line>
-  )
+  return <primitive object={lineObject} />
 }
