@@ -6,6 +6,8 @@ import { StatusBar } from './components/ui/StatusBar'
 import { TimelinePanel } from './components/ui/TimelinePanel'
 import { FilterPanel } from './components/ui/FilterPanel'
 import { TopBar } from './components/ui/TopBar'
+import { PortPresetSwitcher } from './components/ui/PortPresetSwitcher'
+import { InsightsPanel } from './components/ui/InsightsPanel'
 import { useStore } from './store/useStore'
 
 const WorldScene = lazy(() => import('./components/scene/WorldScene').then((m) => ({ default: m.WorldScene })))
@@ -157,6 +159,8 @@ export default function App() {
       {viewMode === 'port' && <ControlPanel />}
       {viewMode === 'port' && <FilterPanel />}
       {viewMode === 'port' && <TimelinePanel />}
+      {viewMode === 'port' && <PortPresetSwitcher />}
+      <InsightsPanel />
       <Suspense fallback={null}><KnowledgeGraph /></Suspense>
     </div>
   )

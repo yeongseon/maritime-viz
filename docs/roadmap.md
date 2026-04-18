@@ -23,13 +23,14 @@
 - [x] **컨테이너 추적 뷰** — 선박 선택 시 실어진 컨테이너 목록 (B/L 단위)
 - [x] **코드 분할** — WorldScene / InlandScene / KnowledgeGraph 동적 import (초기 번들 42KB)
 - [x] UI 전체 i18n — KO/EN (StatusBar, InfoPanel, ControlPanel, FilterPanel, TimelinePanel, DataImport, SearchBox, TopBar)
-- [ ] WebSocket 기반 실시간 데이터 모드 (현재는 클라이언트 시뮬레이션)
+- [x] **WebSocket-스타일 실시간 이벤트 스트림** — Live mode 활성 시 5초마다 자동 이벤트 생성, InsightsPanel에 push
 
 ## 장기 (v1.0)
 
-- [ ] **다중 항만 비교 모드** (부산 vs 광양 vs 인천)
+- [x] **다중 항만 비교 모드** (부산 / 광양 / 인천 프리셋, 1-click 전환)
 - [ ] **시뮬레이션 엔진** — what-if 분석 (선석 추가/크레인 증설)
-- [ ] **AI 기반 병목 예측** — 향후 6시간 혼잡도 예측
+- [x] **룰 기반 병목 추론** — 야드 혼잡 + 입항 예정 / 게이트 과부하 / CO2 스파이크 / 선석 기아 (4 rules)
+- [ ] AI 기반 병목 예측 (ML — 향후 6시간 혼잡도)
 - [ ] **OWL 기반 추론 엔진** — Apache Jena/Stardog 연동
 - [ ] **AR/VR 뷰** — Quest/Vision Pro 지원
 
@@ -47,7 +48,7 @@
 
 - [x] Three.js bundle 동적 import (WorldScene/InlandScene/KnowledgeGraph 분할 ✅)
 - [x] InstancedMesh로 컨테이너 박스 렌더링 최적화
-- [ ] InstancedMesh로 야드 박스 렌더링 최적화
+- [x] InstancedMesh로 야드 컨테이너 스택 렌더링 (셀 단위 stack visualization)
 - [ ] E2E 테스트 (Playwright)
 - [ ] Visual regression 테스트 (Percy/Chromatic)
 - [ ] Storybook으로 컴포넌트 카탈로그

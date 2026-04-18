@@ -1,6 +1,8 @@
 import { create } from 'zustand'
-import type { SelectedEntity, EntityType, RelationType, PortData, Vessel } from '../types'
+import type { SelectedEntity, EntityType, RelationType, PortData, Vessel, LogisticsEvent } from '../types'
 import { busanPortData } from '../data/portData'
+import { portPresets } from '../data/portPresets'
+import { generateLiveEvent, inferAlerts, type InferredAlert } from '../lib/inference'
 import type { Lang } from '../i18n'
 
 type OverlayMode = 'none' | 'congestion' | 'carbon' | 'delay'
@@ -66,6 +68,13 @@ interface AppState {
   liveMode: boolean
   toggleLiveMode: () => void
   applyLiveTick: () => void
+  liveEvents: LogisticsEvent[]
+  clearLiveEvents: () => void
+
+  activePortPresetId: string
+  setActivePortPreset: (id: string) => void
+
+  inferredAlerts: () => InferredAlert[]
 
   selectedEntity: SelectedEntity | null
   hoveredEntity: SelectedEntity | null
@@ -177,8 +186,33 @@ export const useStore = create<AppState>((set, get) => ({
       ...v,
       co2EmissionRate: +Math.max(0.5, v.co2EmissionRate + (Math.random() - 0.5) * 0.4).toFixed(2),
     }))
-    return { portData: next }
+    const generated = generateLiveEvent(next, Date.now())
+    const liveEvents = generated ? [generated, ...s.liveEvents].slice(0, 30) : s.liveEvents
+    return { portData: next, liveEvents }
   }),
+  liveEvents: [],
+  clearLiveEvents: () => set({ liveEvents: [] }),
+
+  activePortPresetId: 'port_busan',
+  setActivePortPreset: (id) => {
+    const preset = portPresets.find((p) => p.id === id)
+    if (!preset) return
+    const range = computeTimeRange(preset.data)
+    set({
+      portData: preset.data,
+      activePortPresetId: id,
+      isCustomData: false,
+      timeRange: range,
+      currentTime: range.max,
+      selectedEntity: null,
+      liveEvents: [],
+    })
+  },
+
+  inferredAlerts: () => {
+    const s = get()
+    return inferAlerts(s.portData, s.currentTime)
+  },
 
   selectedEntity: null,
   hoveredEntity: null,
