@@ -1,0 +1,118 @@
+site_name: 해운물류 온톨로지 기반 3D 시각화 플랫폼
+site_description: 선박·항만·터미널·야드·컨테이너의 관계를 온톨로지로 구조화하고 3D로 시각화하는 플랫폼
+site_author: yeongseon
+site_url: https://yeongseon.github.io/maritime-viz/docs/
+repo_url: https://github.com/yeongseon/maritime-viz
+repo_name: yeongseon/maritime-viz
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: ko
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: 다크 모드로 전환
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: 라이트 모드로 전환
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - 홈: index.md
+  - 시작하기:
+      - 개요: getting-started/overview.md
+      - 설치 및 실행: getting-started/installation.md
+      - 라이브 데모: getting-started/demo.md
+  - 도메인 & 온톨로지:
+      - 문제 정의: domain/problem.md
+      - 온톨로지 스키마: domain/ontology.md
+      - 데이터 모델: domain/data-model.md
+      - 관계 정의: domain/relations.md
+  - 3D 시각화:
+      - 시각화 원칙: visualization/principles.md
+      - 시각적 문법: visualization/visual-grammar.md
+      - 인터랙션: visualization/interaction.md
+      - 오버레이 모드: visualization/overlays.md
+  - 아키텍처:
+      - 시스템 구조: architecture/system.md
+      - 컴포넌트 구성: architecture/components.md
+      - 상태 관리: architecture/state.md
+  - 사용 시나리오:
+      - 항만 혼잡 파악: scenarios/congestion.md
+      - 지연 원인 탐색: scenarios/delay.md
+      - 탄소 영향 파악: scenarios/carbon.md
+  - 개발:
+      - 프로젝트 구조: development/structure.md
+      - 기여 가이드: development/contributing.md
+      - 배포: development/deployment.md
+  - 로드맵: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search:
+      lang:
+        - ko
+        - en
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/yeongseon/maritime-viz
+  generator: false
+
+copyright: Copyright &copy; 2026 yeongseon · MIT License
