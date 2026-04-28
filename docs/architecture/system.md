@@ -35,7 +35,7 @@ graph LR
 ### 1. Data Layer
 
 - **`src/types/index.ts`** — TypeScript 타입 정의 (온톨로지)
-- **`src/data/portData.ts`** — 정적 mock 데이터 (부산항)
+- **`src/data/portData.ts`** — 정적 mock 데이터 (울산항)
 
 향후 실제 API 연동 시 이 레이어만 교체하면 됩니다.
 

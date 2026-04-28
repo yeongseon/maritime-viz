@@ -35,8 +35,8 @@ export interface OntologyRelation {
 {
   "port": {
     "id": "port_busan",
-    "name": "Busan Port",
-    "nameKo": "부산항",
+    "name": "Ulsan Port",
+    "nameKo": "울산항",
     "terminals": ["terminal_1", "terminal_2", "terminal_3"]
   },
   "vessels": [
@@ -93,7 +93,7 @@ export interface OntologyRelation {
 
 | 클래스 | 개수 |
 |---|---|
-| Port | 1 (Busan) |
+| Port | 1 (Ulsan) |
 | Terminal | 3 |
 | Berth | 8 |
 | YardBlock | 9 |

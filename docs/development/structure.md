@@ -18,7 +18,7 @@ maritime-viz/
 │   ├── types/
 │   │   └── index.ts               # 온톨로지 TypeScript 타입
 │   ├── data/
-│   │   └── portData.ts            # 부산항 mock 데이터
+│   │   └── portData.ts            # 울산항 mock 데이터
 │   ├── store/
 │   │   └── useStore.ts            # Zustand 단일 스토어
 │   ├── components/
