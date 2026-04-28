@@ -10,7 +10,7 @@
 ## 핵심 특징
 
 - **온톨로지 기반 데이터 모델** — Vessel · Port · Terminal · Berth · Yard · Gate · Container · Event · Emission
-- **3D 디지털트윈** — 부산항 기반 미니어처 시각화 (선석 점유 / 야드 적치율 / 게이트 대기열)
+- **3D 디지털트윈** — 울산항 기반 미니어처 시각화 (선석 점유 / 야드 적치율 / 게이트 대기열)
 - **관계 탐색** — 객체 클릭 시 온톨로지 관계가 실시간으로 시각화
 - **운영 오버레이** — Congestion · Delay · Carbon 모드 전환
 - **Knowledge Graph 뷰** — 노드-엣지 그래프로 의미 관계 탐색

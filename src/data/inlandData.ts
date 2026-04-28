@@ -14,11 +14,11 @@ export interface InlandLink {
 }
 
 export const inlandNodes: InlandNode[] = [
-  { id: 'in_busan', name: 'Busan Port', kind: 'port', position: [0, 0, 0] },
+  { id: 'in_busan', name: 'Ulsan Port', kind: 'port', position: [0, 0, 0] },
   { id: 'in_yangsan', name: 'Yangsan ICD', kind: 'icd', position: [-12, 0, -8] },
   { id: 'in_uiwang', name: 'Uiwang ICD', kind: 'icd', position: [-22, 0, -22] },
   { id: 'in_seoul_cy', name: 'Seoul CY', kind: 'cy', position: [-26, 0, -28] },
-  { id: 'in_busan_rail', name: 'Busan Rail Hub', kind: 'rail', position: [-4, 0, -4] },
+  { id: 'in_busan_rail', name: 'Ulsan Rail Hub', kind: 'rail', position: [-4, 0, -4] },
   { id: 'in_daegu', name: 'Daegu CY', kind: 'cy', position: [-14, 0, -16] },
   { id: 'in_gwangyang', name: 'Gwangyang Port', kind: 'port', position: [-30, 0, 6] },
   { id: 'in_incheon', name: 'Incheon Port', kind: 'port', position: [-32, 0, -26] },

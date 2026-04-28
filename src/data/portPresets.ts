@@ -57,7 +57,7 @@ function deriveVariant(opts: {
 }
 
 export const portPresets: PortPreset[] = [
-  { id: 'port_busan', name: 'Busan', nameKo: '부산항', data: busanPortData },
+  { id: 'port_busan', name: 'Ulsan', nameKo: '울산항', data: busanPortData },
   {
     id: 'port_gwangyang',
     name: 'Gwangyang',

@@ -15,7 +15,7 @@ export interface WorldRoute {
 }
 
 export const worldPorts: WorldPort[] = [
-  { id: 'wp_busan', name: 'Busan', lat: 35.18, lon: 129.07, country: 'KR', isHome: true },
+  { id: 'wp_busan', name: 'Ulsan', lat: 35.54, lon: 129.39, country: 'KR', isHome: true },
   { id: 'wp_shanghai', name: 'Shanghai', lat: 31.23, lon: 121.47, country: 'CN' },
   { id: 'wp_singapore', name: 'Singapore', lat: 1.29, lon: 103.85, country: 'SG' },
   { id: 'wp_hongkong', name: 'Hong Kong', lat: 22.32, lon: 114.17, country: 'HK' },

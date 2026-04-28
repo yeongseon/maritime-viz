@@ -3,7 +3,7 @@ export type Lang = 'ko' | 'en'
 type Dict = Record<string, { ko: string; en: string }>
 
 const T: Dict = {
-  port_title: { ko: '부산항 (Busan Port)', en: 'Busan Port' },
+  port_title: { ko: '울산항 (Ulsan Port)', en: 'Ulsan Port' },
   subtitle: { ko: '해운물류 온톨로지 3D 시각화', en: '3D Maritime Logistics Ontology Visualization' },
   terminals: { ko: '터미널', en: 'Terminals' },
   vessels: { ko: '선박', en: 'Vessels' },

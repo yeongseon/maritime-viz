@@ -3,8 +3,8 @@ import type { PortData } from '../types'
 export const busanPortData: PortData = {
   port: {
     id: 'port_busan',
-    name: 'Busan Port',
-    nameKo: '부산항',
+    name: 'Ulsan Port',
+    nameKo: '울산항',
     position: [0, 0, 0],
     terminals: ['terminal_1', 'terminal_2', 'terminal_3'],
   },
@@ -128,7 +128,7 @@ export const busanPortData: PortData = {
   containers: [
     { id: 'cnt_001', status: 'yard', vesselId: 'vessel_001', yardBlockId: 'yard_A1', position: [-24, 0.3, 2], dwellTimeHours: 48, destination: 'Seoul ICD' },
     { id: 'cnt_002', status: 'yard', vesselId: 'vessel_001', yardBlockId: 'yard_A1', position: [-23, 0.3, 2], dwellTimeHours: 72, destination: 'Daejeon Hub' },
-    { id: 'cnt_003', status: 'yard', vesselId: 'vessel_002', yardBlockId: 'yard_A2', position: [-18, 0.3, 2], dwellTimeHours: 24, destination: 'Busan Warehouse' },
+    { id: 'cnt_003', status: 'yard', vesselId: 'vessel_002', yardBlockId: 'yard_A2', position: [-18, 0.3, 2], dwellTimeHours: 24, destination: 'Ulsan Warehouse' },
     { id: 'cnt_004', status: 'on_vessel', vesselId: 'vessel_006', yardBlockId: null, position: [-10, 1, -25], dwellTimeHours: 0, destination: 'Terminal 1' },
     { id: 'cnt_005', status: 'yard', vesselId: 'vessel_003', yardBlockId: 'yard_B1', position: [1, 0.3, 2], dwellTimeHours: 96, destination: 'Gwangyang' },
     { id: 'cnt_006', status: 'yard', vesselId: 'vessel_004', yardBlockId: 'yard_C1', position: [23, 0.3, 2], dwellTimeHours: 36, destination: 'Incheon Port' },
